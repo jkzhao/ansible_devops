@@ -1,0 +1,7 @@
+- hosts: 116.62.20.63
+  remote_user: root
+  vars:
+      touch_file: wisedu.file
+  tasks:
+      - name: touch file
+        shell: "touch /tmp/{{ touch_file }}"

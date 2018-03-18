@@ -16,26 +16,9 @@ from ansible.executor.playbook_executor import PlaybookExecutor #核心类执行
 # InventoryManager类
 loader = DataLoader()
 inventory = InventoryManager(loader=loader, sources=['hosts']) #资产配置文件可以填写相对路径和绝对路径，如果有多个，列表中用逗号隔开
-# host_dict = inventory.get_groups_dict() #读取主机组和主机
-# print(host_dict)
-# host_list = inventory.get_hosts()
-# print(host_list)
-# hosts = inventory.get_hosts(pattern="test")
-# print(hosts)
-# host = inventory.get_host(hostname='172.16.7.151')
-# print(host)
-# inventory.add_host(host='172.16.7.153', port='22', group='test')
-# print(inventory.get_groups_dict())
-# print("===========")
 
 # VariableManager类
 variableManager = VariableManager(loader=loader, inventory=inventory)
-# print(variableManager.get_vars(host=host)) #获取某个主机的变量
-# variableManager.set_host_variable(host=host, varname="ansible_ssh_pass", value='654321')  #设置或修改变量
-# print(variableManager.get_vars(host=host))
-# variableManager.extra_vars = {"myweb":"node1", "myname":"tom"} #设置额外的变量，这个设置的变量是全局的
-# print(variableManager.get_vars(host=host))
-# print(variableManager.get_vars()) #不传入具体主机，也可以获得上面设置的extra_vars
 
 # Options 执行选项
 Options = namedtuple('Options',
@@ -76,30 +59,14 @@ options = Options(connection='smart', #local：该连接类型将在控制机本
                   listtags=None,
                   syntax=None)
 
-# Play() 执行对象和模块
-play_source = dict(name="Ansible Play ad-hoc demo",
-                   hosts='172.16.206.30',
-                   gather_facts='no',
-                   tasks=[
-                       dict(action=dict(module='shell', args='touch /tmp/e.txt')),
-                   ]
-                   )
-play = Play().load(play_source, variable_manager=variableManager, loader=loader)
+# PlaybookExecutor 执行playbook
+passwords = dict()
+playbook = PlaybookExecutor(playbooks=['test.yml'],
+                            inventory=inventory,
+                            variable_manager=variableManager,
+                            loader=loader,
+                            options=options,
+                            passwords=passwords)
 
-# actually run it
-passwords = dict() #没有什么实际的意义，密码都是存在hosts这个资产配置文件中了
-try:
-    tqm = TaskQueueManager(
-        inventory=inventory,
-        variable_manager=variableManager,
-        loader=loader,
-        options=options,
-        passwords=passwords,
-    )
-    result = tqm.run(play)
-    print(type(result))
-    print(result)
-finally:
-    if tqm is not None:
-        tqm.cleanup()
+playbook.run()
 
