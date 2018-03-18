@@ -1,0 +1,61 @@
+
+使用ssh密码方式登录主机，需要在ansible主机上安装sshpass。
+Mac:
+    brew install sshpass
+CentOS:
+    yum install sshpass
+强烈建议不使用ssh密码方式登录。
+
+1.核心类
+from ansible.parsing.dataloader import DataLoader  #用于读取yaml、json格式的文件，所在模块ansible.parsing.dataloader
+from ansible.vars.manager import VariableManager  #用于存储各类变量信息
+from ansible.inventory.manager import InventoryManager #用于导入inventory文件
+from ansible.inventory.host import Host #操作单个主机或者主机组信息
+from ansible.inventory.group import Group
+from ansible.playbook.play import Play  #用于存储执行hosts的角色信息，所在模块ansible.playbook.play
+from ansible.executor.task_queue_manager import TaskQueueManager #ansible底层用到的任务队列
+from ansible.plugins.callback import CallbackBase #状态回调，各种成功失败的状态
+from ansible.executor.playbook_executor import PlaybookExecutor #核心类执行playbook副本
+
+2.InventoryManager
+管理主机、主机组信息
+
+（1）添加主机到指定主机组 add_host()
+（2）查看主机组资源 get_groups_dict()
+（3）获取指定的主机对象 get_host()
+
+
+3.VariableManager
+（1）查看变量方法 get_vars()
+（2）设置或修改主机变量方法 set_host_variable()
+（3）添加扩展变量 extra_vars 这不是方法，是对象的属性
+
+
+4.ad-hoc模式调用
+ansible -m command -a "ls /tmp" testgroup -i /etc/ansible/hosts -f 5
+        --------------------------------- --------------------- ----
+                  执行对象和模块              资源资产配置清单     执行选项
+
+资源资产配置清单            执行选项      执行对象和模块
+InventoryManager         Options()         Play()
+      ↓                     ↓               ↓
+VariableManager             ↓               ↓
+      ↓                     ↓               ↓
+                 最后通过TaskQueueManager()执行
+
+
+5.playbook模式调用
+ansible-playbook webserver.yml -i /etc/ansible/hosts -f 5
+                 ------------- --------------------- ----
+                   剧本文件       资源资产配置清单      执行选项
+
+资源资产配置清单            执行选项
+InventoryManager         Options()
+      ↓                     ↓
+VariableManager             ↓
+      ↓                     ↓
+     最后通过PlaybookExecutor()执行
+
+6.callback改写
+
+

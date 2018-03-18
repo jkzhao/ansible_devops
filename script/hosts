@@ -1,0 +1,17 @@
+[test]
+172.16.206.30 ansible_user=root ansible_ssh_private_key_file=/Users/jkzhao/.ssh/id_rsa
+172.16.206.32
+172.16.206.16 ansible_ssh_user=root ansible_ssh_pass='wisedu123'
+
+[test_group2]
+172.16.7.151 ansible_ssh_user=root ansible_ssh_pass='123456'
+172.16.7.152 ansible_ssh_user=root
+
+[test_group3]
+172.16.7.151 ansible_ssh_user=root ansible_ssh_pass='123456'
+172.16.7.152 ansible_ssh_user=root
+
+[test_group1:children]
+test_group2
+test_group3
+
