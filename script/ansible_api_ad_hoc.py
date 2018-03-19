@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-#核心类
 from collections import namedtuple
-
+import json
+#核心类
 from ansible.parsing.dataloader import DataLoader  #用于读取yaml、json格式的文件，所在模块ansible.parsing.dataloader
 from ansible.vars.manager import VariableManager  #用于存储各类变量信息
 from ansible.inventory.manager import InventoryManager #用于导入inventory文件
@@ -86,6 +86,27 @@ play_source = dict(name="Ansible Play ad-hoc demo",
                    )
 play = Play().load(play_source, variable_manager=variableManager, loader=loader)
 
+class ModelResultsCollector(CallbackBase):
+    """
+    重写CallbackBase类的部分方法
+    """
+    def __init__(self, *args, **kwargs):
+        super(ModelResultsCollector, self).__init__(*args, **kwargs)
+        self.host_ok = {}
+        self.host_unreachable = {}
+        self.host_failed = {}
+
+    def v2_runner_on_unreachable(self, result): # result是父类中的一个对象
+        self.host_unreachable[result._host.get_name()] = result
+
+    def v2_runner_on_ok(self, result, *args, **kwargs):
+        self.host_ok[result._host.get_name()] = result
+
+    def v2_runner_on_failed(self, result, *args, **kwargs):
+        self.host_failed[result._host.get_name()] = result
+
+callback = ModelResultsCollector()
+
 # actually run it
 passwords = dict() #没有什么实际的意义，密码都是存在hosts这个资产配置文件中了
 try:
@@ -95,11 +116,21 @@ try:
         loader=loader,
         options=options,
         passwords=passwords,
+        stdout_callback=callback
     )
-    result = tqm.run(play)
-    print(type(result))
-    print(result)
+    tqm.run(play)
 finally:
     if tqm is not None:
         tqm.cleanup()
+
+#print(callback.host_ok.items())
+result_raw = {'success':{}, 'failed':{}, 'unreachable':{}}
+for host,result in callback.host_ok.items():
+    result_raw['success'][host] = result._result
+for host,result in callback.host_failed.items():
+    result_raw['failed'][host] = result._result
+for host,result in callback.host_unreachable.items():
+    result_raw['unreachable'][host] = result._result
+print(result_raw)
+
 

@@ -57,5 +57,13 @@ VariableManager             ↓
      最后通过PlaybookExecutor()执行
 
 6.callback改写
+（1）通过子类继承父类(callbackbase)
+（2）通过子类改写父类的部分方法
+    v2_runner_on_unreachable
+    v2_runner_on_ok
+    v2_runner_on_failed
+
+    为什么要重写callback？自定义输出格式，json格式输出
+
 
 
