@@ -38,13 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'taskdo'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -77,10 +78,10 @@ WSGI_APPLICATION = 'ansible_devops.wsgi.application'
 DATABASES = {
     'default': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME':'navigation',
-    'USER': 'root',
-    'PASSWORD': 'wisedu123',
-    'HOST': '116.62.20.63',
+    'NAME':'ansible',
+    'USER': 'ansible',
+    'PASSWORD': 'Wiscom@2018',
+    'HOST': '121.40.113.254',
     'PORT': '3306',
     }
 }
@@ -126,3 +127,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
 	os.path.join(BASE_DIR, "static"), #最后要有逗号，否则会报错
 )
+
+# Mongo DB
+MONGO_HOST = '121.40.113.254'
+MONGO_PORT = '27017'
+
+# Redis Con
+REDSI_KWARGS_LPUSH = {"host":'121.40.113.254', 'port':6400, 'db':3}
+REDSI_LPUSH_POOL = None
