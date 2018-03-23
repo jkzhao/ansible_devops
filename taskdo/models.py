@@ -22,3 +22,7 @@ class ConnectionInfo(models.Model):
         verbose_name = '用户登录信息表'
         verbose_name_plural = verbose_name
         db_table = "connectioninfo"
+
+    def __str__(self):
+        return self.ssh_hostip
+
