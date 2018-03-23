@@ -65,5 +65,52 @@ VariableManager             ↓
 
     为什么要重写callback？自定义输出格式，json格式输出
 
+自动化任务接口设计
+    对ansible的核心类功能进行封装，提供API接口给前端
+    URL层：Django url路由实现请求url跳转
+    view层：Django逻辑视图实现任务逻辑处理
+    util层: ansible实现ad-hoc、playbook功能封装
+
+    数据库事件记录和状态记录：
+        Mongodb实现事件日志记录 pymongo
+        Redis任务锁功能和状态记录 redis
+
+        事件日志的意义：
+            提交任务时，能实时追踪任务的执行进展
+            {"taskid":self.task_id, "time":time, "id":id, "desc":record_info}
+
+        redis任务锁功能和状态记录
+            使用redis实现任务加锁
+            为什么加锁？执行ad-hoc任务时，任务是按照顺序一个一个执行的，任务1执行完，在执行任务2。
+            但是前台提交的人不懂这些，他随意地去提交，他提交完第一个任务后，马上又提交了一个任务。
+            所以为了确保第一个任务执行完在执行第二个任务，在工程里面加一个锁。
+
+    测试：
+        1.提交ad-hoc任务
+            postman发送请求：
+            {
+              "taskid": "123123",
+              "mod_type": "shell",
+              "exec_args": "touch /tmp/wiscom",
+              "group_name": "test",
+              "sn_key": ["b827eb97580d"]
+            }
+            响应：
+            {
+                "info": {
+                    "failed": {
+                        "3b0dcc9f-a5ba-4a29-bf1a-e2b0a85725ac": {
+                            "failed": true,
+                            "msg": "to use the 'ssh' connection type with passwords, you must install the sshpass program"
+                        }
+                    },
+                    "success": {},
+                    "unreachable": {}
+                },
+                "status": "success"
+            }
+
+        2.获取某个任务的事件日志
+            浏览器输入网址发送请求：http://127.0.0.1:8000/ansible/adhoclog/?taskid=123124
 
 

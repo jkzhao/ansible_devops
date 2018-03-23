@@ -24,9 +24,8 @@ from ansible_devops.settings import BASE_DIR
 
 class MyInventory():
     """
-    this is IOPS ansible inventory object.
+    this is ansible inventory object.
     """
-
     def __init__(self, resource, loader, variable_manager):
         self.resource = resource
         self.loader = DataLoader()
@@ -42,8 +41,8 @@ class MyInventory():
 
         # if group variables exists, add them to group
         if groupvars:
-            for key, value in groupvars.iteritems():
-                my_group.set_variable(key, value)
+            for key in groupvars:
+                my_group.set_variable(key, groupvars[key])
 
         # add hosts to group
         for host in hosts:
@@ -64,9 +63,9 @@ class MyInventory():
             # my_host.set_variable('ansible_ssh_private_key_file', ssh_key)
 
             # set other variables
-            for key, value in host.iteritems():
+            for key in host:
                 if key not in ["hostname", "port", "username", "password"]:
-                    self.variable_manager.set_host_variable(host=my_host, varname=key, value=value)
+                    self.variable_manager.set_host_variable(host=my_host, varname=key, value=host[key])
 
             # add to group
             self.inventory.add_host(host=hostname, group=groupname, port=hostport)
@@ -79,8 +78,8 @@ class MyInventory():
         if isinstance(self.resource, list):
             self.add_dynamic_group(self.resource, 'default_group')
         elif isinstance(self.resource, dict):
-            for groupname, hosts_and_vars in self.resource.iteritems():
-                self.add_dynamic_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
+            for groupname in self.resource:
+                self.add_dynamic_group(self.resource[groupname].get("hosts"), groupname, self.resource[groupname].get("vars"))
 
 class ModelResultsCollector(CallbackBase):
 

@@ -1,0 +1,3 @@
+[wisedu]
+172.16.206.30:22 ansible_ssh_user=root
+172.16.206.32:22 ansible_ssh_user=root
