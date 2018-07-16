@@ -109,7 +109,7 @@ class PlayBookResultsCollector(CallbackBase):
         self.task_unreachable = {}
 
     def v2_runner_on_ok(self, result, *args, **kwargs):
-        self.task_ok[result._host.get_name()]  = result
+        self.task_ok[result._host.get_name()] = result
 
     def v2_runner_on_failed(self, result, *args, **kwargs):
         self.task_failed[result._host.get_name()] = result
@@ -118,7 +118,7 @@ class PlayBookResultsCollector(CallbackBase):
         self.task_unreachable[result._host.get_name()] = result
 
     def v2_runner_on_skipped(self, result):
-        self.task_ok[result._host.get_name()]  = result
+        self.task_ok[result._host.get_name()] = result
 
     def v2_playbook_on_stats(self, stats):
         hosts = sorted(stats.processed.keys())
@@ -173,9 +173,10 @@ class ANSRunner(object):
 
     def run_model(self, host_list, module_name, module_args):
         """
-        run module from andible ad-hoc.
+        run module from ansible ad-hoc.
         module_name: ansible module_name
         module_args: ansible module args
+
         """
         play_source = dict(
                 name="Ansible Play",
